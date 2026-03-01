@@ -1,0 +1,1 @@
+export const CAROUSEL_IMAGE_WIDTH = 300;
