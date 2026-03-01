@@ -12,6 +12,7 @@ export default function CarouselItem({
   const {
     containerRef,
     currentPosX,
+    isSliding,
     total,
     offset,
     gap = 10,
@@ -25,6 +26,7 @@ export default function CarouselItem({
   const startPosX = useRef<number>(null);
   const isDragging = useRef(false);
   const handlePointerDown = (e: React.PointerEvent) => {
+    if (isSliding) return;
     const pointerId = e.pointerId;
     if (currentPointerId && currentPointerId !== pointerId) return;
     e.currentTarget.setPointerCapture(pointerId);
@@ -46,15 +48,16 @@ export default function CarouselItem({
       e.currentTarget.releasePointerCapture(pointerId);
       handlePointerUp(e);
       return;
-      //   const newPosX = startPosX.current! - e.clientX;
-      //   setCurrentPosX(currentPosX - newPosX);
-      //   setCurrentPointerId(undefined);
-      //   startPosX.current = null;
-      //   return;
     }
     if (currentPointerId && currentPointerId !== pointerId) return;
     const newPosX = startPosX.current! - x;
     containerRef.current!.style.transform = `translate3d(${currentPosX - newPosX}px,0,0)`;
+  };
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    isDragging.current = false;
+    setCurrentPointerId(undefined);
+    startPosX.current = null;
+    e.currentTarget.releasePointerCapture(e.pointerId);
   };
   const handlePointerUp = (e: React.PointerEvent) => {
     isDragging.current = false;
@@ -82,20 +85,24 @@ export default function CarouselItem({
         containerRef.current!.style.transform = `translate3d(${currentPosX + (imageWidth + gap)}px,0,0)`;
       }
     }
-    setTimeout(() => {
-      containerRef.current!.style.transition = "";
-      if (currentIndex - 1 === -2) {
-        const newPosx = -offset - (total - 2) * imageWidth - (total - 2) * gap;
-        containerRef.current!.style.transform = `translate3d(${newPosx}px,0,0)`;
-        setCurrentIndex(total - 2);
-        setCurrentPosX(newPosx);
-      } else if (currentIndex + 1 - total === 0) {
-        const newPosx = -offset;
-        containerRef.current!.style.transform = `translate3d(${newPosx}px,0,0)`;
-        setCurrentIndex(0);
-        setCurrentPosX(newPosx);
-      }
-    }, 500);
+    if (newPosX >= 40) {
+      setTimeout(() => {
+        containerRef.current!.style.transition = "";
+        if (currentIndex - 1 === -2) {
+          const newPosx =
+            -offset - (total - 2) * imageWidth - (total - 2) * gap;
+          containerRef.current!.style.transform = `translate3d(${newPosx}px,0,0)`;
+          setCurrentIndex(total - 2);
+          setCurrentPosX(newPosx);
+        } else if (currentIndex + 1 - total === 0) {
+          const newPosx = -offset;
+          containerRef.current!.style.transform = `translate3d(${newPosx}px,0,0)`;
+          setCurrentIndex(0);
+          setCurrentPosX(newPosx);
+        }
+      }, 500);
+    }
+
     setCurrentPointerId(undefined);
     startPosX.current = null;
     e.currentTarget.releasePointerCapture(e.pointerId);
@@ -107,10 +114,12 @@ export default function CarouselItem({
         flex: "none",
         height: 300,
         position: "relative",
+        touchAction: "none",
       }}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerMove={handlePointerMove}
+      onPointerCancel={handlePointerCancel}
     >
       {children}
     </span>

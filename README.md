@@ -18,9 +18,9 @@ yarn dev
 
 - File `src/App.tsx` chứa cách setup carousel
 
-# Explanation of how drag (mouse) interactions are implemented
+# Explanation of how drag (mouse) and swipe (touch) interactions are implemented
 
-- Sử dụng các events là onPointerDown, onPointerMove, onPointerUp.
+- Sử dụng các events là onPointerDown, onPointerMove, onPointerUp, onPointerCancel.
 
 - Công thức tính drag distance: (x1 - x)
 
@@ -45,3 +45,7 @@ yarn dev
   - Khi load trang hoặc khi không hover vào carousel sẽ dùng setInteval với time là 3000ms để trigger auto slide
   - Sử dụng event onMouseEnter để clear setInterval.
   - Sử dụng event onMouseLeave để đặt lại setInterval khi bỏ hover carousel
+
+# Case bỏ qua
+
+- Bỏ qua case có quá nhiều phần tử do yêu cầu của đề bài (The component should simulate real-world use cases such as banner sliders, news carousels, or advertising placements.)

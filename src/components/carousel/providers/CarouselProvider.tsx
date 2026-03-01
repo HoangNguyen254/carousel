@@ -18,6 +18,7 @@ interface CarouselContextType {
   currentIndex: number;
   offset: number;
   total: number;
+  isSliding: boolean;
   boundingLeft?: number;
   gap?: number;
   currentPointerId?: number;
@@ -32,6 +33,7 @@ const CarouselContext = createContext<CarouselContextType>({
   containerRef: { current: null },
   wrapperRef: { current: null },
   offset: 0,
+  isSliding: false,
   currentPosX: 0,
   total: 0,
   currentIndex: 0,
@@ -58,6 +60,7 @@ export const CarouselProvider = ({
 }: PropsWithChildren<CarouselProviderProps>) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [isSliding, setIsSliding] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [boundingLeft, setBoundingLeft] = useState(0);
   const [pointerId, setPointerId] = useState<number>();
@@ -87,6 +90,7 @@ export const CarouselProvider = ({
     }, 3000);
   };
   const handleAutoNextSlide = () => {
+    setIsSliding(true);
     const imageWidth = CAROUSEL_IMAGE_WIDTH;
     const newIndex = indexRef.current + 1;
     setCurrentIndex(newIndex);
@@ -101,6 +105,7 @@ export const CarouselProvider = ({
         setCurrentIndex(0);
         setCurrentPosX(newPosx);
       }
+      setIsSliding(false);
     }, 500);
   };
   const handleWindowResize = () => {
@@ -136,6 +141,7 @@ export const CarouselProvider = ({
       value={{
         containerRef,
         currentIndex,
+        isSliding,
         total,
         gap,
         offset,
