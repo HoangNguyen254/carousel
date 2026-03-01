@@ -19,25 +19,29 @@ interface CarouselContextType {
   offset: number;
   total: number;
   isSliding: boolean;
+  cursorMode: CursorMode;
   boundingLeft?: number;
   gap?: number;
   currentPointerId?: number;
+  setCursorMode: (status: CursorMode) => void;
   setCurrentPosX: (posX: number) => void;
   onMouseEnter: () => void;
   onMouseOut: () => void;
   setCurrentPointerId: (id?: number) => void;
   setCurrentIndex: (index: number) => void;
 }
-
+type CursorMode = "grabbing" | "grab";
 const CarouselContext = createContext<CarouselContextType>({
   containerRef: { current: null },
   wrapperRef: { current: null },
+  cursorMode: "grab",
   offset: 0,
   isSliding: false,
   currentPosX: 0,
   total: 0,
   currentIndex: 0,
   setCurrentPosX: () => {},
+  setCursorMode: () => {},
   onMouseOut: () => {},
   onMouseEnter: () => {},
   setCurrentPointerId: () => {},
@@ -62,6 +66,7 @@ export const CarouselProvider = ({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [isSliding, setIsSliding] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [cursorMode, setCursorMode] = useState<CursorMode>("grab");
   const [boundingLeft, setBoundingLeft] = useState(0);
   const [pointerId, setPointerId] = useState<number>();
   const [currentPosX, setCurrentPosX] = useState(-offset);
@@ -113,6 +118,9 @@ export const CarouselProvider = ({
     const { x } = wrapperRef.current.getBoundingClientRect();
     setBoundingLeft(x);
   };
+  const handleSetCursorMode = (status: CursorMode) => {
+    setCursorMode(status);
+  };
   useEffect(() => {
     indexRef.current = currentIndex;
     currentPosXRef.current = currentPosX;
@@ -143,6 +151,7 @@ export const CarouselProvider = ({
         currentIndex,
         isSliding,
         total,
+        cursorMode,
         gap,
         offset,
         wrapperRef,
@@ -150,6 +159,7 @@ export const CarouselProvider = ({
         currentPosX: currentPosX,
         boundingLeft: boundingLeft,
         setCurrentPosX: handleSetCurrentPosX,
+        setCursorMode: handleSetCursorMode,
         onMouseEnter: handleMouseEnter,
         onMouseOut: handleMouseOut,
         setCurrentPointerId: handleSetPointerId,

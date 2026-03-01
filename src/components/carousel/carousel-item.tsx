@@ -16,10 +16,12 @@ export default function CarouselItem({
     total,
     offset,
     gap = 10,
+    cursorMode,
     currentIndex,
     boundingLeft,
     currentPointerId,
     setCurrentIndex,
+    setCursorMode,
     setCurrentPointerId,
     setCurrentPosX,
   } = useCarousel();
@@ -27,6 +29,7 @@ export default function CarouselItem({
   const isDragging = useRef(false);
   const handlePointerDown = (e: React.PointerEvent) => {
     if (isSliding) return;
+    setCursorMode("grabbing");
     const pointerId = e.pointerId;
     if (currentPointerId && currentPointerId !== pointerId) return;
     e.currentTarget.setPointerCapture(pointerId);
@@ -55,6 +58,7 @@ export default function CarouselItem({
   };
   const handlePointerCancel = (e: React.PointerEvent) => {
     isDragging.current = false;
+    setCursorMode("grab");
     setCurrentPointerId(undefined);
     startPosX.current = null;
     e.currentTarget.releasePointerCapture(e.pointerId);
@@ -62,6 +66,7 @@ export default function CarouselItem({
   const handlePointerUp = (e: React.PointerEvent) => {
     isDragging.current = false;
     const newPosX = Math.abs(startPosX.current! - e.clientX);
+    setCursorMode("grab");
     if (newPosX <= 5) {
       onClick?.();
       return;
@@ -115,6 +120,7 @@ export default function CarouselItem({
         height: 300,
         position: "relative",
         touchAction: "none",
+        cursor: cursorMode,
       }}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
