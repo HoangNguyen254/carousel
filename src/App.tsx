@@ -46,7 +46,7 @@ function App() {
           <CarouselItem
             key={item.id}
             onClick={() => {
-              alert("1111");
+              window.open(item.landing_page, "_blank", "noopener,noreferrer");
             }}
           >
             <img
